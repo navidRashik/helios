@@ -26,13 +26,12 @@ func (p *backendHungryProvider) Launch(provider.SessionSpec) (provider.Launch, e
 
 func (p *backendHungryProvider) SetBackend(b backend.Backend) { p.got = b }
 
-// TestWireBackendsWiresEveryCapableProvider defends the class of bug where the
-// daemon named the providers to wire by hand and silently missed one: a
-// provider that accepts a backend but never received it leaves its QueuePrompt
-// and terminal actions returning "no terminal" in production while every unit
-// test passes by injecting the backend directly. wireBackends must reach every
-// registered provider that implements the setter, discovered by the interface
-// it implements — not by a hand-kept list.
+// wireBackends must reach every registered provider that accepts a backend,
+// resolving them by the setter interface they implement rather than by name.
+// A provider that drives a session terminal but is handed no backend returns
+// "no terminal" from QueuePrompt and its terminal actions; a unit test that
+// injects the backend directly cannot see that, so this test exercises the
+// daemon's own wiring against a provider discovered only through the registry.
 func TestWireBackendsWiresEveryCapableProvider(t *testing.T) {
 	fake := &backendHungryProvider{id: "fake-backend-provider"}
 	if err := provider.Register(fake); err != nil {
