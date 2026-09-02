@@ -15,8 +15,6 @@ import (
 	"github.com/kamrul1157024/helios/internal/backend"
 	"github.com/kamrul1157024/helios/internal/notifications"
 	"github.com/kamrul1157024/helios/internal/provider"
-	claude "github.com/kamrul1157024/helios/internal/provider/claude"
-	codex "github.com/kamrul1157024/helios/internal/provider/codex"
 	"github.com/kamrul1157024/helios/internal/server"
 	"github.com/kamrul1157024/helios/internal/store"
 	"github.com/kamrul1157024/helios/internal/terminal"
@@ -175,9 +173,8 @@ func startDaemon(cfg *Config) error {
 	// Shared state between both servers
 	shared := server.NewShared(db, mgr, term)
 
-	// Give the claude action handlers access to session terminals
-	claude.SetBackend(term)
-	codex.SetBackend(term)
+	// Give every provider that drives a terminal access to it.
+	wireBackends(term)
 
 	// Discover existing Claude sessions from transcript files
 	go provider.DiscoverAll(db)

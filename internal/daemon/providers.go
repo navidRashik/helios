@@ -3,6 +3,7 @@ package daemon
 import (
 	"sync"
 
+	"github.com/kamrul1157024/helios/internal/backend"
 	"github.com/kamrul1157024/helios/internal/featureflag"
 	"github.com/kamrul1157024/helios/internal/provider"
 	claude "github.com/kamrul1157024/helios/internal/provider/claude"
@@ -49,4 +50,23 @@ func RegisterProviders(internalPort int) {
 // callers that have not loaded config themselves.
 func RegisterDefaultProviders() {
 	RegisterProviders(DefaultConfig().Server.InternalPort)
+}
+
+// backendReceiver is a provider that drives a session's terminal and so needs
+// the shared backend.
+type backendReceiver interface {
+	SetBackend(backend.Backend)
+}
+
+// wireBackends gives every registered provider that drives a terminal access
+// to the shared backend. Resolving the capability by assertion means a new
+// provider is wired by registering, not by editing this call site — the thing
+// that decides which providers can answer a phone approval or hold a queued
+// prompt is the interface they implement, nothing here.
+func wireBackends(term backend.Backend) {
+	for _, p := range provider.All() {
+		if r, ok := p.(backendReceiver); ok {
+			r.SetBackend(term)
+		}
+	}
 }
