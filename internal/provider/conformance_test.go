@@ -8,6 +8,7 @@ import (
 	"github.com/kamrul1157024/helios/internal/provider"
 	claude "github.com/kamrul1157024/helios/internal/provider/claude"
 	codex "github.com/kamrul1157024/helios/internal/provider/codex"
+	opencode "github.com/kamrul1157024/helios/internal/provider/opencode"
 )
 
 // Every provider the daemon registers, registered the same way here.
@@ -18,7 +19,7 @@ import (
 // covered by it.
 func registered(t *testing.T) []provider.Provider {
 	t.Helper()
-	return []provider.Provider{claude.New(0, 0), codex.New(0)}
+	return []provider.Provider{claude.New(0, 0), codex.New(0), opencode.New(0)}
 }
 
 func TestConformance(t *testing.T) {

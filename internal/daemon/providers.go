@@ -7,6 +7,7 @@ import (
 	"github.com/kamrul1157024/helios/internal/provider"
 	claude "github.com/kamrul1157024/helios/internal/provider/claude"
 	codex "github.com/kamrul1157024/helios/internal/provider/codex"
+	opencode "github.com/kamrul1157024/helios/internal/provider/opencode"
 )
 
 var registerOnce sync.Once
@@ -36,6 +37,11 @@ func RegisterProviders(internalPort int) {
 		// reads the same evidence to decide what to report.
 		codex.SetStateDir(HeliosDir())
 		provider.MustRegister(codex.New(internalPort))
+		// opencode records the same evidence for the same reason: a plugin
+		// that is written and named in config may still have failed to load,
+		// and only a hook that arrived proves otherwise.
+		opencode.SetStateDir(HeliosDir())
+		provider.MustRegister(opencode.New(internalPort))
 	})
 }
 

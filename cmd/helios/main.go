@@ -656,6 +656,8 @@ func wrapProvider(bin string) string {
 		return "claude"
 	case "codex":
 		return "codex"
+	case "opencode":
+		return "opencode"
 	default:
 		return ""
 	}
@@ -664,9 +666,10 @@ func wrapProvider(bin string) string {
 func wrapCommand(parts []string) (sessionID string, cmd []string, providerID string) {
 	providerID = wrapProvider(parts[0])
 	if providerID != "claude" {
-		// Only Claude takes an id from us. Codex mints its own and reports it
-		// through its session-start hook, so helios keeps this one as the row
-		// key and learns the other later.
+		// Only Claude takes an id from us. Codex and opencode both mint their
+		// own and report it — through a session-start hook and through the
+		// plugin respectively — so helios keeps this one as the row key and
+		// learns the other later.
 		return uuid.New().String(), parts, providerID
 	}
 
@@ -701,6 +704,10 @@ func explicitPermissionMode(parts []string) string {
 			return parts[i+1]
 		case strings.HasPrefix(a, "--permission-mode="):
 			return strings.TrimPrefix(a, "--permission-mode=")
+		// opencode's own name for the same thing, and recorded under the name
+		// opencode would accept back, since a resume has to repeat the flag.
+		case a == "--auto":
+			return "auto"
 		}
 	}
 	return ""
