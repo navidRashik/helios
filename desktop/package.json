@@ -10,9 +10,9 @@
   },
   "main": "dist/main/main.js",
   "scripts": {
-    "build": "node init && node build.mjs",
+    "build": "node build.mjs",
     "watch": "node build.mjs --watch",
-    "dev": "node init && node build.mjs && electron .",
+    "dev": "node build.mjs && electron .",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-strip-types test/*.test.ts",
     "e2e": "node build.mjs && playwright test",
